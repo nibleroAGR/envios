@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Recogidas | Envios-1c52b</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        <header class="mb-8 border-l-4 border-blue-600 pl-4">
+            <h1 class="text-3xl font-bold text-slate-800">Gestión de Recogidas</h1>
+            <p class="text-slate-600">Proyecto: envios-1c52b</p>
+        </header>
+
+        <div class="bg-white shadow-md rounded-xl overflow-hidden">
+            <div class="p-6 bg-blue-600">
+                <h2 class="text-white text-lg font-medium">Nueva Solicitud de Envío</h2>
+            </div>
+            
+            <form id="envioForm" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="col-span-2 text-sm font-bold text-slate-400 uppercase tracking-wider">Destinatario</div>
+                    
+                    <input type="text" id="nombre" placeholder="Nombre completo" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="email" id="email" placeholder="Correo electrónico" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="text" id="direccion" placeholder="Dirección de entrega" required 
+                        class="col-span-2 w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="text" id="ciudad" placeholder="Ciudad" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="text" id="cp" placeholder="Código Postal" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 pt-4">
+                    <div class="col-span-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Paquete</div>
+                    
+                    <input type="number" id="peso" placeholder="Peso (kg)" step="0.1" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="number" id="largo" placeholder="Largo (cm)" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="number" id="ancho" placeholder="Ancho (cm)" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                    
+                    <input type="number" id="alto" placeholder="Alto (cm)" required 
+                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
+                </div>
+
+                <button type="submit" id="btnGuardar"
+                    class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transform active:scale-95 transition-all">
+                    GUARDAR EN LA NUBE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // TUS DATOS REALES
+        const firebaseConfig = {
+            apiKey: "AIzaSyASO9jFh3yPIU23F7STH-03B3N4EdFnvdg",
+            authDomain: "envios-1c52b.firebaseapp.com",
+            projectId: "envios-1c52b",
+            storageBucket: "envios-1c52b.firebasestorage.app",
+            messagingSenderId: "309577598161",
+            appId: "1:309577598161:web:ede8cdcc9317a752bbf1f0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('envioForm');
+        const btn = document.getElementById('btnGuardar');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Bloqueamos el botón para evitar duplicados
+            btn.disabled = true;
+            btn.innerText = "GUARDANDO...";
+            btn.classList.replace('bg-blue-600', 'bg-slate-400');
+
+            const datos = {
+                cliente: {
+                    nombre: document.getElementById('nombre').value,
+                    email: document.getElementById('email').value,
+                    direccion: document.getElementById('direccion').value,
+                    ciudad: document.getElementById('ciudad').value,
+                    cp: document.getElementById('cp').value
+                },
+                medidas: {
+                    peso: parseFloat(document.getElementById('peso').value),
+                    largo: parseInt(document.getElementById('largo').value),
+                    ancho: parseInt(document.getElementById('ancho').value),
+                    alto: parseInt(document.getElementById('alto').value)
+                },
+                status: "pendiente",
+                creadoEl: serverTimestamp() // Usa la hora del servidor
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "recogidas"), datos);
+                alert("¡Éxito! Se ha creado el registro en la nube.");
+                form.reset();
+            } catch (error) {
+                console.error("Error detallado:", error);
+                alert("Hubo un error. Revisa la consola (F12) para ver si Firestore está activo en 'Modo de Prueba'.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "GUARDAR EN LA NUBE";
+                btn.classList.replace('bg-slate-400', 'bg-blue-600');
+            }
+        });
+    </script>
+</body>
+</html>
