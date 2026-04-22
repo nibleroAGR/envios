@@ -3,71 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Recogidas | Envios-1c52b</title>
+    <title>Sistema de Gestión Logística | Packlink & Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 font-sans">
+<body class="bg-slate-50 font-sans text-slate-900">
 
-    <div class="max-w-4xl mx-auto py-10 px-4">
-        <header class="mb-8 border-l-4 border-blue-600 pl-4">
-            <h1 class="text-3xl font-bold text-slate-800">Gestión de Recogidas</h1>
-            <p class="text-slate-600">Proyecto: envios-1c52b</p>
-        </header>
-
-        <div class="bg-white shadow-md rounded-xl overflow-hidden">
-            <div class="p-6 bg-blue-600">
-                <h2 class="text-white text-lg font-medium">Nueva Solicitud de Envío</h2>
+    <nav class="bg-slate-900 text-white py-4 px-6 shadow-lg mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-box-open text-blue-400 text-2xl"></i>
+                <span class="text-xl font-bold tracking-tight">Logistics<span class="text-blue-400">Pro</span></span>
             </div>
-            
-            <form id="envioForm" class="p-8 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="col-span-2 text-sm font-bold text-slate-400 uppercase tracking-wider">Destinatario</div>
-                    
-                    <input type="text" id="nombre" placeholder="Nombre completo" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="email" id="email" placeholder="Correo electrónico" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="text" id="direccion" placeholder="Dirección de entrega" required 
-                        class="col-span-2 w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="text" id="ciudad" placeholder="Ciudad" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="text" id="cp" placeholder="Código Postal" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 pt-4">
-                    <div class="col-span-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Paquete</div>
-                    
-                    <input type="number" id="peso" placeholder="Peso (kg)" step="0.1" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="number" id="largo" placeholder="Largo (cm)" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="number" id="ancho" placeholder="Ancho (cm)" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                    
-                    <input type="number" id="alto" placeholder="Alto (cm)" required 
-                        class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-2 transition-colors">
-                </div>
-
-                <button type="submit" id="btnGuardar"
-                    class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transform active:scale-95 transition-all">
-                    GUARDAR EN LA NUBE
-                </button>
-            </form>
+            <div class="text-sm text-slate-400">ID Proyecto: envios-1c52b</div>
         </div>
-    </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 pb-20">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-8">
+                    <div class="p-6 border-b border-slate-100 bg-slate-50">
+                        <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-blue-600"></i>
+                            Nueva Recogida
+                        </h2>
+                    </div>
+                    
+                    <form id="envioForm" class="p-6 space-y-4">
+                        <div class="space-y-3">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Datos del Cliente</p>
+                            <input type="text" id="nombre" placeholder="Nombre completo" required 
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            <input type="email" id="email" placeholder="Email" required 
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" id="direccion" placeholder="Dirección" required 
+                                class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="ciudad" placeholder="Ciudad" required 
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <input type="text" id="cp" placeholder="CP" required 
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Dimensiones</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="relative">
+                                    <input type="number" id="peso" placeholder="Peso" step="0.1" required class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-4 pr-8 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <span class="absolute right-3 top-3 text-xs text-slate-400">kg</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" id="largo" placeholder="Largo" required class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-4 pr-8 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <span class="absolute right-3 top-3 text-xs text-slate-400">cm</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" id="ancho" placeholder="Ancho" required class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-4 pr-8 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <span class="absolute right-3 top-3 text-xs text-slate-400">cm</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" id="alto" placeholder="Alto" required class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-4 pr-8 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <span class="absolute right-3 top-3 text-xs text-slate-400">cm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnGuardar"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-200 transition-all flex justify-center items-center gap-2 group">
+                            <span>Guardar Recogida</span>
+                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Total Hoy</p>
+                        <p id="statTotal" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-yellow-400">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Pendientes</p>
+                        <p id="statPendientes" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-green-400">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Etiquetados</p>
+                        <p id="statOk" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                        <h2 class="font-bold text-slate-800">Cola de Envíos Realtime</h2>
+                        <div class="flex gap-2">
+                            <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Conectado a Firestore</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-[11px] font-black text-slate-400 uppercase tracking-tighter">
+                                    <th class="px-6 py-4">Cliente</th>
+                                    <th class="px-6 py-4 text-center">Paquete</th>
+                                    <th class="px-6 py-4">Estado</th>
+                                    <th class="px-6 py-4 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCuerpo" class="divide-y divide-slate-100">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // TUS DATOS REALES
         const firebaseConfig = {
             apiKey: "AIzaSyASO9jFh3yPIU23F7STH-03B3N4EdFnvdg",
             authDomain: "envios-1c52b.firebaseapp.com",
@@ -80,16 +140,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // 1. GUARDAR DATOS
         const form = document.getElementById('envioForm');
-        const btn = document.getElementById('btnGuardar');
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Bloqueamos el botón para evitar duplicados
+            const btn = document.getElementById('btnGuardar');
             btn.disabled = true;
-            btn.innerText = "GUARDANDO...";
-            btn.classList.replace('bg-blue-600', 'bg-slate-400');
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> Guardando...';
 
             const datos = {
                 cliente: {
@@ -106,22 +163,69 @@
                     alto: parseInt(document.getElementById('alto').value)
                 },
                 status: "pendiente",
-                creadoEl: serverTimestamp() // Usa la hora del servidor
+                creadoEl: serverTimestamp()
             };
 
             try {
-                const docRef = await addDoc(collection(db, "recogidas"), datos);
-                alert("¡Éxito! Se ha creado el registro en la nube.");
+                await addDoc(collection(db, "recogidas"), datos);
                 form.reset();
-            } catch (error) {
-                console.error("Error detallado:", error);
-                alert("Hubo un error. Revisa la consola (F12) para ver si Firestore está activo en 'Modo de Prueba'.");
+            } catch (err) {
+                alert("Error: " + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "GUARDAR EN LA NUBE";
-                btn.classList.replace('bg-slate-400', 'bg-blue-600');
+                btn.innerHTML = '<span>Guardar Recogida</span><i class="fas fa-arrow-right"></i>';
             }
         });
+
+        // 2. LEER DATOS REALTIME
+        const q = query(collection(db, "recogidas"), orderBy("creadoEl", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const cuerpo = document.getElementById('tablaCuerpo');
+            cuerpo.innerHTML = "";
+            let pendientes = 0;
+            let etiquetados = 0;
+
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                if(d.status === 'pendiente') pendientes++; else etiquetados++;
+                
+                const fila = `
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <p class="font-bold text-slate-800 text-sm">${d.cliente.nombre}</p>
+                            <p class="text-xs text-slate-400">${d.cliente.ciudad}, ${d.cliente.cp}</p>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded font-mono">
+                                ${d.medidas.peso}kg | ${d.medidas.largo}x${d.medidas.ancho}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md ${d.status === 'pendiente' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'}">
+                                ${d.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="generarPacklink('${doc.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-[11px] font-bold py-2 px-3 rounded-lg transition-all active:scale-90">
+                                <i class="fas fa-barcode mr-1"></i> ETIQUETA
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                cuerpo.innerHTML += fila;
+            });
+
+            document.getElementById('statTotal').innerText = snapshot.size;
+            document.getElementById('statPendientes').innerText = pendientes;
+            document.getElementById('statOk').innerText = etiquetados;
+        });
+
+        // 3. LÓGICA DE PACKLINK (PREPARADA)
+        window.generarPacklink = (id) => {
+            console.log("Conectando con API Packlink para ID:", id);
+            alert("Llamada a Packlink PRO iniciada.\nEnviando datos del registro: " + id);
+            // El siguiente paso será crear la Cloud Function para procesar esto con tu API Key
+        }
     </script>
 </body>
 </html>
