@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Writer Pro | Edición Fluida 2026</title>
+    <title>E-Writer Pro | Edición y PDF Profesional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
@@ -13,81 +13,89 @@
         
         .script-font { font-family: 'Courier Prime', monospace; font-size: 12pt; line-height: 1.2; }
         
-        /* Contenedor del Papel con saltos de página */
+        /* Contenedor y Papel con Saltos de Página Reales */
         .paper-container { background-color: #1e293b; flex: 1; overflow-y: auto; padding: 40px 0; scroll-behavior: smooth; }
         
         #paper {
             width: 210mm; min-height: 297mm; background: white; color: black;
-            padding: 25mm; margin: 0 auto; outline: none; white-space: pre-wrap;
+            padding: 25.4mm; /* Margen estándar de 1 pulgada */
+            margin: 0 auto; outline: none; white-space: pre-wrap;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            background-image: linear-gradient(to bottom, transparent 1049px, #e2e8f0 1050px);
-            background-size: 100% 1050px; /* Línea visual de salto de página */
+            /* Línea visual de salto de página */
+            background-image: linear-gradient(to bottom, transparent 1045px, #e2e8f0 1046px);
+            background-size: 100% 1046px;
         }
 
-        /* Estilos de Guion */
-        #paper div { margin: 0; padding: 0; min-height: 1.2em; border-left: 3px solid transparent; transition: border 0.2s; }
-        #paper div:focus { border-left: 3px solid #3b82f6; background: #f8fafc; }
+        /* Formatos de Guion */
+        #paper div { margin: 0; padding: 0; min-height: 1.2em; border-left: 2px solid transparent; }
+        #paper div:focus { border-left-color: #3b82f6; background-color: #fcfcfc; }
 
         .slugline { font-weight: bold; text-transform: uppercase; margin-top: 25px !important; }
-        .action { margin-top: 10px !important; }
+        .action { margin-top: 12px !important; }
         .character { width: 50%; margin: 20px auto 0 auto !important; text-align: center; text-transform: uppercase; }
         .parenthetical { width: 35%; margin: 0 auto !important; text-align: center; }
         .parenthetical::before { content: "("; } .parenthetical::after { content: ")"; }
         .dialogue { width: 70%; margin: 0 auto 10px auto !important; text-align: center; }
         .transition { width: 30%; margin: 20px 0 0 auto !important; text-align: right; font-weight: bold; text-transform: uppercase; }
 
-        /* Notificaciones */
-        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); transition: all 0.4s ease; z-index: 1000; }
-        #toast.show { bottom: 30px; }
+        /* Estilos específicos para la exportación PDF */
+        @media print {
+            body { background: white; }
+            .paper-container { padding: 0; overflow: visible; }
+            #paper { box-shadow: none; margin: 0; background-image: none; width: 100%; }
+            @page { margin: 0; }
+        }
 
+        /* Notificaciones Toast */
+        #toast { position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%); transition: all 0.4s ease; z-index: 1000; }
+        #toast.show { bottom: 30px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="toast" class="bg-slate-800 border border-slate-700 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3">
-        <span id="toast-icon" class="text-blue-500 font-bold">●</span>
+    <div id="toast" class="bg-slate-800 border border-slate-700 px-6 py-2 rounded-full shadow-2xl flex items-center gap-2">
         <span id="toast-msg" class="text-sm font-medium"></span>
     </div>
 
     <div id="landing" class="h-screen w-full flex flex-col items-center justify-center bg-slate-950">
-        <h1 class="text-7xl font-black mb-8 tracking-tighter italic">E-<span class="text-blue-500">WRITER</span></h1>
-        <button onclick="authAction('login')" class="bg-blue-600 hover:bg-blue-500 px-10 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-blue-500/20">Acceder con Google</button>
+        <h1 class="text-7xl font-black mb-8 italic tracking-tighter">E-<span class="text-blue-500">WRITER</span></h1>
+        <button onclick="authAction('login')" class="bg-blue-600 hover:bg-blue-500 px-10 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-blue-500/20">Entrar con Google</button>
     </div>
 
     <div id="editor-ui" class="hidden h-screen flex flex-col">
         <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
                 <span class="text-blue-500 font-black text-xl">EW</span>
-                <input type="text" id="script-title" class="bg-slate-800 border-none rounded-lg px-4 py-1 text-slate-300 w-64 text-sm focus:ring-2 focus:ring-blue-600" value="Guion">
+                <input type="text" id="script-title" class="bg-slate-800 border-none rounded-lg px-4 py-1 text-slate-300 w-64 text-sm focus:ring-1 focus:ring-blue-600" value="Mi Guion">
             </div>
             <div class="flex items-center gap-4">
                 <img id="user-img" src="" class="w-8 h-8 rounded-full border border-slate-700">
-                <button onclick="authAction('logout')" class="text-xs text-slate-500 hover:text-white uppercase font-bold">Salir</button>
+                <button onclick="authAction('logout')" class="text-xs text-slate-500 font-bold hover:text-white uppercase">Salir</button>
             </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
             <aside class="w-20 bg-slate-950 border-r border-slate-800 flex flex-col items-center py-6 gap-6 shrink-0">
-                <div class="flex flex-col gap-4 border-b border-slate-800 pb-6">
-                    <button onclick="newProject()" title="Nuevo" class="p-3 text-blue-400 hover:bg-slate-900 rounded-xl">➕</button>
-                    <button onclick="cloudSave()" title="Guardar" class="p-3 text-emerald-500 hover:bg-slate-900 rounded-xl">💾</button>
-                    <button onclick="openLoadModal()" title="Abrir" class="p-3 text-amber-500 hover:bg-slate-900 rounded-xl">📂</button>
-                    <button onclick="exportPDF()" title="Exportar PDF" class="p-3 text-rose-500 hover:bg-slate-900 rounded-xl">📄</button>
+                <div class="flex flex-col gap-4 border-b border-slate-800 pb-6 items-center w-full">
+                    <button onclick="newProject()" title="Nuevo" class="text-blue-400 p-2 hover:bg-slate-900 rounded-lg">➕</button>
+                    <button onclick="cloudSave()" title="Guardar" class="text-emerald-500 p-2 hover:bg-slate-900 rounded-lg">💾</button>
+                    <button onclick="openLoadModal()" title="Cargar" class="text-amber-500 p-2 hover:bg-slate-900 rounded-lg">📂</button>
+                    <button onclick="exportPDF()" title="Descargar PDF" class="text-rose-500 p-2 hover:bg-slate-900 rounded-lg">📄</button>
                 </div>
-                <div class="flex flex-col gap-4">
-                    <button onclick="setFormat('slugline')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Escena">🎬</button>
-                    <button onclick="setFormat('action')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Acción">📝</button>
-                    <button onclick="setFormat('character')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Personaje">👤</button>
-                    <button onclick="setFormat('parenthetical')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Paréntesis">💬</button>
-                    <button onclick="setFormat('dialogue')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Diálogo">🗣️</button>
-                    <button onclick="setFormat('transition')" class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors" title="Transición">🎞️</button>
+                <div class="flex flex-col gap-3">
+                    <button onclick="setFormat('slugline')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Escena">🎬</button>
+                    <button onclick="setFormat('action')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Acción">📝</button>
+                    <button onclick="setFormat('character')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Personaje">👤</button>
+                    <button onclick="setFormat('parenthetical')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Paréntesis">💬</button>
+                    <button onclick="setFormat('dialogue')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Diálogo">🗣️</button>
+                    <button onclick="setFormat('transition')" class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors" title="Transición">🎞️</button>
                 </div>
             </aside>
 
-            <main class="paper-container custom-scrollbar">
+            <main class="paper-container">
                 <div id="paper" class="script-font" contenteditable="true" spellcheck="false">
-                    <div class="slugline">INT. APARTAMENTO - NOCHE</div>
+                    <div class="slugline">INT. APARTAMENTO - DÍA</div>
                     <div class="action">Escribe tu historia aquí...</div>
                 </div>
             </main>
@@ -95,7 +103,7 @@
             <aside class="w-64 bg-slate-900 border-l border-slate-800 p-6 shrink-0 flex flex-col gap-8">
                 <div>
                     <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Información</h3>
-                    <div class="space-y-3">
+                    <div class="space-y-2">
                         <div class="flex justify-between text-sm"><span>Escenas</span> <span id="stat-scenes" class="font-bold">1</span></div>
                         <div class="flex justify-between text-sm font-bold text-blue-400"><span>Páginas</span> <span id="stat-pages">1</span></div>
                     </div>
@@ -108,11 +116,11 @@
         </div>
     </div>
 
-    <div id="load-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
-            <h2 class="text-xl font-bold mb-6 italic">MIS GUIONES</h2>
+    <div id="load-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur z-[100] flex items-center justify-center">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-8 shadow-2xl">
+            <h2 class="text-xl font-bold mb-6 text-center italic">MIS PROYECTOS</h2>
             <div id="projects-list" class="space-y-2 mb-6"></div>
-            <button onclick="closeModal()" class="text-slate-500 font-bold uppercase text-xs">Cerrar</button>
+            <button onclick="closeModal()" class="w-full text-slate-500 font-bold text-xs uppercase">Cerrar</button>
         </div>
     </div>
 
@@ -144,14 +152,13 @@
         };
 
         window.authAction = (t) => t === 'login' ? signInWithPopup(auth, provider) : signOut(auth);
-        
         onAuthStateChanged(auth, u => {
             if(u) {
                 userUID = u.uid;
                 document.getElementById('landing').classList.add('hidden');
                 document.getElementById('editor-ui').classList.remove('hidden');
                 document.getElementById('user-img').src = u.photoURL;
-                toast("Sesión Sincronizada");
+                toast("Nube Sincronizada");
                 loadDraft();
             } else {
                 userUID = null;
@@ -160,7 +167,7 @@
             }
         });
 
-        // FORMATEO UX MEJORADO
+        // FORMATEO UX PROFESIONAL
         window.setFormat = (cls) => {
             document.execCommand('formatBlock', false, 'div');
             const selection = window.getSelection();
@@ -173,8 +180,9 @@
                     element.className = cls;
                 }
             }
-            // Devolver el foco al papel inmediatamente
-            document.getElementById('paper').focus();
+            // Retorno de foco inmediato al papel
+            const paper = document.getElementById('paper');
+            paper.focus();
             analyze();
         };
 
@@ -184,8 +192,8 @@
                 await setDoc(doc(db, "users", userUID, "projects", title), {
                     title, html: document.getElementById('paper').innerHTML, date: new Date()
                 });
-                toast("Guardado correctamente");
-            } catch (e) { toast("Error al guardar"); }
+                toast("Guardado Correctamente");
+            } catch (e) { toast("Error de Red"); }
         };
 
         window.openLoadModal = async () => {
@@ -210,23 +218,30 @@
 
         window.closeModal = () => document.getElementById('load-modal').classList.add('hidden');
 
+        // EXPORTACIÓN PDF CORREGIDA CON MÁRGENES
         window.exportPDF = () => {
-            toast("Generando Archivo...");
+            toast("Preparando PDF...");
             const element = document.getElementById('paper');
-            const opt = { margin: 0, filename: 'guion.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            html2pdf().from(element).set(opt).save();
+            const opt = { 
+                margin: 0, 
+                filename: `${document.getElementById('script-title').value}.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            };
+            html2pdf().from(element).set(opt).save().then(() => toast("PDF Descargado"));
         };
 
         function analyze() {
             const p = document.getElementById('paper');
             document.getElementById('stat-scenes').innerText = p.querySelectorAll('.slugline').length;
-            document.getElementById('stat-pages').innerText = Math.ceil(p.scrollHeight / 1050) || 1;
+            document.getElementById('stat-pages').innerText = Math.ceil(p.scrollHeight / 1046) || 1;
             
             const chars = [...new Set(Array.from(p.querySelectorAll('.character')).map(el => el.innerText.trim().toUpperCase()))].filter(n => n.length > 0);
-            document.getElementById('character-list').innerHTML = chars.map(n => `<span class="px-2 py-1 bg-slate-800 text-blue-400 text-[9px] font-bold rounded-lg border border-slate-700 uppercase">${n}</span>`).join('');
+            document.getElementById('character-list').innerHTML = chars.map(n => `<span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-[9px] font-bold rounded-lg border border-blue-500/20 uppercase">${n}</span>`).join('');
         }
 
-        // INTELIGENCIA DE TECLADO
+        // LÓGICA DE TECLADO INTELIGENTE
         document.getElementById('paper').addEventListener('keydown', e => {
             if (e.key === 'Tab') {
                 e.preventDefault();
@@ -241,6 +256,7 @@
                         if (prev === 'slugline') setFormat('action');
                         else if (prev === 'character') setFormat('dialogue');
                         else if (prev === 'parenthetical') setFormat('dialogue');
+                        else if (prev === 'transition') setFormat('slugline');
                     }
                 }, 10);
             }
@@ -248,7 +264,7 @@
 
         document.getElementById('paper').addEventListener('input', analyze);
         window.setFormat = setFormat;
-        window.newProject = () => { if(confirm("¿Nuevo proyecto?")) document.getElementById('paper').innerHTML = '<div class="slugline">NUEVA ESCENA</div><div class="action">...</div>'; };
+        window.newProject = () => { if(confirm("¿Crear nuevo proyecto?")) { document.getElementById('paper').innerHTML = '<div class="slugline">NUEVA ESCENA</div><div class="action">...</div>'; analyze(); } };
     </script>
 </body>
 </html>
