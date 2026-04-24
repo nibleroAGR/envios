@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Writer | Suite Profesional 2026</title>
+    <title>E-Writer Pro | Suite 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --slate-950: #020617; --slate-900: #0f172a; --slate-800: #1e293b; }
+        :root { --slate-950: #020617; --slate-900: #0f172a; }
         body { font-family: 'Inter', sans-serif; background-color: var(--slate-950); color: #f8fafc; overflow: hidden; }
         .script-font { font-family: 'Courier Prime', monospace; font-size: 12pt; line-height: 1.2; }
         
         /* Contenedor del Papel */
-        .paper-container { background-color: #334155; box-shadow: inset 0 0 100px rgba(0,0,0,0.5); }
+        .paper-container { background-color: #1e293b; background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 20px 20px; }
         #paper {
             width: 210mm; min-height: 297mm; background: white; color: black;
             padding: 25mm; margin: 40px auto; outline: none; white-space: pre-wrap;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5); position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6); position: relative;
         }
 
-        /* Estilos de Guion Estándar */
+        /* Formatos Estándar */
         .slugline { font-weight: bold; text-transform: uppercase; margin-top: 25px; margin-bottom: 10px; }
         .action { margin-top: 10px; margin-bottom: 10px; }
         .character { width: 50%; margin: 20px auto 0 auto; text-align: center; text-transform: uppercase; }
@@ -29,99 +29,96 @@
         .dialogue { width: 70%; margin: 0 auto 10px auto; text-align: center; }
         .transition { width: 30%; margin: 20px 0 0 auto; text-align: right; font-weight: bold; text-transform: uppercase; }
 
+        /* Menú Contextual */
+        #context-menu { position: absolute; z-index: 1000; display: none; background: #1e293b; border: 1px solid #334155; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); width: 180px; padding: 5px; }
+        .menu-item { padding: 8px 12px; font-size: 13px; cursor: pointer; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .menu-item:hover { background: #3b82f6; color: white; }
+        .menu-sep { height: 1px; background: #334155; margin: 4px 0; }
+
         .hidden { display: none !important; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .toast { transform: translateY(100px); transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+        .toast.show { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <div id="landing" class="h-screen w-full flex flex-col items-center justify-center bg-slate-950 px-6 transition-opacity duration-500">
-        <div class="text-center">
-            <h1 class="text-7xl font-extrabold mb-4 tracking-tighter italic">E-<span class="text-blue-500">WRITER</span></h1>
-            <p class="text-slate-400 mb-10 text-lg font-light tracking-wide">EL ESTÁNDAR PROFESIONAL PARA GUIONISTAS DE CINE</p>
-            <button onclick="authAction('login')" class="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-blue-500/20 transition-all transform hover:scale-105">
-                Empezar a escribir con Google
-            </button>
-        </div>
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] toast bg-slate-800 border border-slate-700 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div id="toast-icon" class="text-emerald-500">✓</div>
+        <span id="toast-msg" class="text-sm font-semibold">Guardado correctamente</span>
     </div>
 
-    <div id="editor-ui" class="hidden h-screen flex flex-col fade-in">
-        <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
+    <div id="context-menu">
+        <div class="menu-item" onclick="format('slugline')">Encabezado <span>🎬</span></div>
+        <div class="menu-item" onclick="format('action')">Acción <span>📝</span></div>
+        <div class="menu-item" onclick="format('character')">Personaje <span>👤</span></div>
+        <div class="menu-item" onclick="format('parenthetical')">Paréntesis <span>💬</span></div>
+        <div class="menu-item" onclick="format('dialogue')">Diálogo <span>🗣️</span></div>
+        <div class="menu-item" onclick="format('transition')">Transición <span>🎞️</span></div>
+        <div class="menu-sep"></div>
+        <div class="menu-item" onclick="execCmd('copy')">Copiar <span class="text-[10px] opacity-50">Ctrl+C</span></div>
+        <div class="menu-item" onclick="execCmd('cut')">Cortar <span class="text-[10px] opacity-50">Ctrl+X</span></div>
+        <div class="menu-item" onclick="execCmd('paste')">Pegar <span class="text-[10px] opacity-50">Ctrl+V</span></div>
+    </div>
+
+    <div id="landing" class="h-screen w-full flex flex-col items-center justify-center bg-slate-950">
+        <h1 class="text-6xl font-black mb-4 tracking-tighter">E-<span class="text-blue-500">WRITER</span></h1>
+        <button onclick="authAction('login')" class="bg-blue-600 px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform shadow-xl shadow-blue-500/20">Iniciar con Google</button>
+    </div>
+
+    <div id="editor-ui" class="hidden h-screen flex flex-col">
+        <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6">
             <div class="flex items-center gap-6">
                 <span class="text-blue-500 font-black text-xl">EW</span>
-                <input type="text" id="script-title" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-1 text-slate-200 w-80 text-sm focus:outline-none focus:border-blue-500" value="Guion sin título">
+                <input type="text" id="script-title" class="bg-slate-800 border-none rounded-lg px-4 py-1 text-slate-300 w-64 text-sm focus:ring-1 focus:ring-blue-500" value="Guion sin título">
             </div>
-            <div class="flex items-center gap-6">
-                <span id="save-indicator" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Sincronizado</span>
-                <div class="flex items-center gap-3">
-                    <img id="user-img" src="" class="w-8 h-8 rounded-full border border-slate-700">
-                    <button onclick="authAction('logout')" class="text-xs text-slate-500 hover:text-white transition-colors">SALIR</button>
-                </div>
+            <div class="flex items-center gap-4">
+                <img id="user-img" src="" class="w-8 h-8 rounded-full border border-slate-700">
+                <button onclick="authAction('logout')" class="text-xs text-slate-500">SALIR</button>
             </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
             <aside class="w-16 bg-slate-950 border-r border-slate-800 flex flex-col items-center py-6 gap-8 shrink-0">
-                <div class="flex flex-col gap-6 border-b border-slate-800 pb-6 items-center w-full">
-                    <button onclick="newProject()" title="Nuevo Proyecto" class="text-blue-400 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    </button>
-                    <button onclick="cloudSave()" title="Guardar Ahora" class="text-emerald-500 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                    </button>
-                    <button onclick="openLoadModal()" title="Cargar Proyectos" class="text-amber-500 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9l-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </button>
-                    <button onclick="exportPDF()" title="Exportar PDF" class="text-rose-500 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </button>
+                <div class="flex flex-col gap-6 items-center border-b border-slate-800 pb-6">
+                    <button onclick="newProject()" title="Nuevo"><svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
+                    <button onclick="cloudSave()" title="Guardar"><svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg></button>
+                    <button onclick="openLoadModal()" title="Cargar"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9l-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                    <button onclick="exportPDF()" title="PDF"><svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></button>
                 </div>
-                <div class="flex flex-col gap-6 text-xl">
+                <div class="flex flex-col gap-6">
                     <button onclick="format('slugline')" title="Escena">🎬</button>
                     <button onclick="format('action')" title="Acción">📝</button>
                     <button onclick="format('character')" title="Personaje">👤</button>
+                    <button onclick="format('parenthetical')" title="Paréntesis">💬</button>
                     <button onclick="format('dialogue')" title="Diálogo">🗣️</button>
+                    <button onclick="format('transition')" title="Transición">🎞️</button>
                 </div>
             </aside>
 
-            <main class="flex-1 paper-container overflow-y-auto custom-scrollbar scroll-smooth">
-                <div id="paper" class="script-font" contenteditable="true" spellcheck="true">
-                    <div class="slugline">INT. EJEMPLO - DÍA</div>
-                    <div class="action">Comienza tu historia aquí...</div>
+            <main class="flex-1 paper-container overflow-y-auto">
+                <div id="paper" class="script-font" contenteditable="true">
+                    <div class="slugline">INT. HABITACIÓN - DÍA</div>
+                    <div class="action">Empieza a escribir...</div>
                 </div>
             </main>
 
-            <aside class="w-72 bg-slate-900 border-l border-slate-800 p-6 flex flex-col gap-8 shrink-0">
-                <div>
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Métricas</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                            <p class="text-[10px] text-slate-500 uppercase">Escenas</p>
-                            <p id="stat-scenes" class="text-2xl font-bold">1</p>
-                        </div>
-                        <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                            <p class="text-[10px] text-slate-500 uppercase">Páginas</p>
-                            <p id="stat-pages" class="text-2xl font-bold">1</p>
-                        </div>
-                    </div>
+            <aside class="w-64 bg-slate-900 border-l border-slate-800 p-6 shrink-0">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Métricas</h3>
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between"><span>Escenas</span> <span id="stat-scenes" class="font-bold">1</span></div>
+                    <div class="flex justify-between"><span>Páginas</span> <span id="stat-pages" class="font-bold">1</span></div>
                 </div>
-
-                <div class="flex-1 flex flex-col overflow-hidden">
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Personajes</h3>
-                    <div id="character-list" class="flex flex-wrap gap-2 overflow-y-auto content-start pb-4">
-                        </div>
-                </div>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Personajes</h3>
+                <div id="character-list" class="flex flex-wrap gap-2"></div>
             </aside>
         </div>
     </div>
 
-    <div id="load-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-8 shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6">Mis Proyectos</h2>
-            <div id="projects-list" class="space-y-3 max-h-80 overflow-y-auto mb-8 pr-2">
-                </div>
-            <button onclick="closeModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold transition-colors">Cerrar</button>
+    <div id="load-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6">
+            <h2 class="text-xl font-bold mb-4 tracking-tight">Cargar Proyecto</h2>
+            <div id="projects-list" class="space-y-2 mb-6 max-h-60 overflow-y-auto"></div>
+            <button onclick="closeModal()" class="w-full py-2 text-slate-500">Cerrar</button>
         </div>
     </div>
 
@@ -145,16 +142,42 @@
         const provider = new GoogleAuthProvider();
         let userUID = null;
 
-        // --- AUTENTICACIÓN ---
+        // NOTIFICACIONES
+        window.showToast = (msg, isError = false) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            document.getElementById('toast-icon').innerText = isError ? '✕' : '✓';
+            document.getElementById('toast-icon').className = isError ? 'text-red-500' : 'text-emerald-500';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        };
+
+        // MENU CONTEXTUAL
+        const menu = document.getElementById('context-menu');
+        document.addEventListener('contextmenu', e => {
+            if(document.getElementById('editor-ui').classList.contains('hidden')) return;
+            e.preventDefault();
+            menu.style.display = 'block';
+            menu.style.left = `${e.pageX}px`;
+            menu.style.top = `${e.pageY}px`;
+        });
+        document.addEventListener('click', () => menu.style.display = 'none');
+
+        window.execCmd = (cmd) => {
+            document.execCommand(cmd);
+            showToast(`Acción: ${cmd}`);
+        };
+
+        // AUTH
         window.authAction = (t) => t === 'login' ? signInWithPopup(auth, provider) : signOut(auth);
-        
         onAuthStateChanged(auth, u => {
             if(u) {
                 userUID = u.uid;
                 document.getElementById('landing').classList.add('hidden');
                 document.getElementById('editor-ui').classList.remove('hidden');
                 document.getElementById('user-img').src = u.photoURL;
-                openLoadModal();
+                showToast("Bienvenido, sesión iniciada");
+                cloudLoad();
             } else {
                 userUID = null;
                 document.getElementById('landing').classList.remove('hidden');
@@ -162,126 +185,85 @@
             }
         });
 
-        // --- SISTEMA DE ANÁLISIS (REAL-TIME) ---
-        function analyzeScript() {
-            const paper = document.getElementById('paper');
-            
-            // 1. Contar Escenas
-            const scenes = paper.querySelectorAll('.slugline').length;
-            document.getElementById('stat-scenes').innerText = scenes || 0;
-
-            // 2. Extraer Personajes Únicos
-            const charElements = Array.from(paper.querySelectorAll('.character'));
-            const uniqueChars = [...new Set(charElements.map(el => el.innerText.trim().toUpperCase()))].filter(name => name.length > 0);
-            
-            const listContainer = document.getElementById('character-list');
-            listContainer.innerHTML = uniqueChars.map(name => 
-                `<span class="px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-bold rounded-lg uppercase tracking-wider">${name}</span>`
-            ).join('');
-
-            // 3. Estimación de Páginas (1122px por A4 aprox)
-            const pages = Math.ceil(paper.scrollHeight / 1122);
-            document.getElementById('stat-pages').innerText = pages || 1;
-        }
-
-        // --- ACCIONES DEL EDITOR ---
+        // CORE LOGIC
         window.format = (type) => {
             document.execCommand('formatBlock', false, 'div');
-            const sel = window.getSelection();
-            let node = sel.anchorNode;
-            if (node.nodeType === 3) node = node.parentNode;
+            const node = window.getSelection().anchorNode.parentNode;
             node.className = type;
-            analyzeScript();
-            autoSave();
+            analyze();
         };
 
         window.newProject = async () => {
-            if(confirm("¿Guardar cambios antes de crear uno nuevo?")) await cloudSave();
+            if(confirm("¿Guardar actual antes de limpiar?")) await cloudSave();
             document.getElementById('script-title').value = "Nuevo Proyecto";
-            document.getElementById('paper').innerHTML = '<div class="slugline">INT. NUEVA ESCENA - DÍA</div><div class="action">Comienza a escribir...</div>';
-            analyzeScript();
+            document.getElementById('paper').innerHTML = '<div class="slugline">INT. ESCENA - DÍA</div><div class="action">...</div>';
+            showToast("Nuevo lienzo creado");
+            analyze();
         };
 
         window.cloudSave = async () => {
-            if(!userUID) return;
             const title = document.getElementById('script-title').value;
-            const indicator = document.getElementById('save-indicator');
-            indicator.innerText = "Guardando...";
             try {
                 await setDoc(doc(db, "users", userUID, "projects", title), {
-                    title,
-                    html: document.getElementById('paper').innerHTML,
-                    updated: new Date()
+                    title, html: document.getElementById('paper').innerHTML, date: new Date()
                 });
-                indicator.innerText = "Sincronizado";
-            } catch (e) { indicator.innerText = "Error"; }
+                showToast("Sincronizado en la nube");
+            } catch (e) { showToast("Error al guardar", true); }
         };
 
         window.openLoadModal = async () => {
             const list = document.getElementById('projects-list');
-            list.innerHTML = '<p class="text-slate-500 animate-pulse text-sm">Conectando a la nube...</p>';
+            list.innerHTML = '<p class="text-xs italic text-slate-500">Buscando...</p>';
             document.getElementById('load-modal').classList.remove('hidden');
             const snap = await getDocs(collection(db, "users", userUID, "projects"));
             list.innerHTML = "";
             snap.forEach(d => {
                 const p = d.data();
-                const div = document.createElement('div');
-                div.className = "group flex items-center justify-between p-4 bg-slate-800/50 hover:bg-blue-600/20 border border-slate-700 hover:border-blue-500 rounded-2xl cursor-pointer transition-all";
-                div.innerHTML = `<div><p class="font-bold text-slate-200">${p.title}</p><p class="text-[9px] text-slate-500 uppercase italic">Última edición reciente</p></div>`;
-                div.onclick = () => {
+                const b = document.createElement('button');
+                b.className = "w-full text-left p-3 bg-slate-800 rounded-xl hover:bg-blue-600 transition-colors text-sm";
+                b.innerText = p.title;
+                b.onclick = () => {
                     document.getElementById('paper').innerHTML = p.html;
                     document.getElementById('script-title').value = p.title;
                     closeModal();
-                    analyzeScript();
+                    showToast("Cargado correctamente");
+                    analyze();
                 };
-                list.appendChild(div);
+                list.appendChild(b);
             });
         };
 
         window.closeModal = () => document.getElementById('load-modal').classList.add('hidden');
 
         window.exportPDF = () => {
-            const opt = {
-                margin: 0,
-                filename: `${document.getElementById('script-title').value}.pdf`,
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().from(document.getElementById('paper')).set(opt).save();
+            showToast("Generando PDF...");
+            const opt = { margin: 0, filename: `${document.getElementById('script-title').value}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            html2pdf().from(document.getElementById('paper')).set(opt).save().then(() => showToast("PDF descargado"));
         };
 
-        // --- LÓGICA DE TECLADO ---
-        let timer;
-        const autoSave = () => { clearTimeout(timer); timer = setTimeout(cloudSave, 3000); };
+        function analyze() {
+            const p = document.getElementById('paper');
+            document.getElementById('stat-scenes').innerText = p.querySelectorAll('.slugline').length;
+            document.getElementById('stat-pages').innerText = Math.ceil(p.scrollHeight / 1122) || 1;
+            const chars = [...new Set(Array.from(p.querySelectorAll('.character')).map(el => el.innerText.trim().toUpperCase()))].filter(n => n.length > 0);
+            document.getElementById('character-list').innerHTML = chars.map(n => `<span class="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold rounded uppercase">${n}</span>`).join('');
+        }
 
-        document.getElementById('paper').addEventListener('input', () => {
-            analyzeScript();
-            autoSave();
-        });
-
-        document.getElementById('paper').addEventListener('keydown', (e) => {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                format('character');
-            }
-            if (e.key === 'Enter') {
-                // Inteligencia de flujo: Si estamos en SLUGLINE, el siguiente es ACTION
+        document.getElementById('paper').addEventListener('input', analyze);
+        document.getElementById('paper').addEventListener('keydown', e => {
+            if(e.key === 'Tab') { e.preventDefault(); format('character'); }
+            if(e.key === 'Enter') {
                 setTimeout(() => {
-                    const sel = window.getSelection();
-                    let cur = sel.anchorNode;
-                    if (cur.nodeType === 3) cur = cur.parentNode;
-                    
-                    const prev = cur.previousSibling;
-                    if (prev && prev.classList.contains('slugline')) {
-                        format('action');
-                    } else if (prev && prev.classList.contains('character')) {
-                        format('dialogue');
-                    }
+                    const node = window.getSelection().anchorNode.parentNode;
+                    const prev = node.previousSibling;
+                    if(prev && prev.classList.contains('slugline')) format('action');
+                    if(prev && prev.classList.contains('character')) format('dialogue');
                 }, 10);
             }
         });
 
-        window.format = format; // Exponer a onclick
+        window.cloudLoad = async () => { /* Carga automática del último si se desea */ };
+
     </script>
 </body>
 </html>
